@@ -1,17 +1,28 @@
-let conselho = null;
-let idConselho = null;
+const adviceUpdateButton = document.querySelector(".novo-conselho");
+const adviceNumber = document.querySelector(".numero-conselho");
+const adviceDescription = document.querySelector(".conselho");
 
-document.querySelector('.novo-conselho').addEventListener('click', getConselhos);
+async function getAdvice() {
+  try {
+    const response = await fetch("https://api.adviceslip.com/advice");
 
-    async function getConselhos() {
-        try{
-        const response = await fetch('https://api.adviceslip.com/advice');
-        const data = await response.json();
-        conselho = data.slip.advice;
-        idConselho = data.slip.id;
-        document.querySelector('.conselho').innerText = conselho;
-        document.querySelector('.numero-conselho').innerText = `advice #${idConselho}`;
-    } catch (error) {
-        console.log(error); 
+    if (!response.ok){
+      throw new Error("Ocorreu um erro ao tentar buscar as informações da API");
     }
+
+    const adviceContent = await response.json();
+    const adviceId = `Advice #${adviceContent.slip.id}`;
+    const adviceText = `"${adviceContent.slip.advice}"`;
+
+    adviceNumber.innerText = adviceId;
+    adviceDescription.innerText = adviceText;
+
+  } catch (error) {
+    console.error("Erro ao tentar buscar as informações da API", error);
+  }
+  
 }
+
+adviceUpdateButton.addEventListener("click", getAdvice);
+
+getAdvice();
